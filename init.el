@@ -46,23 +46,28 @@
   (mapc #'(lambda (package)
            (unless (package-installed-p package)
              (package-install package)))
-                '(emmet-mode
-	          flycheck
-	          ido-ubiquitous
-	          ido-vertical-mode
+                '(autopair
+				  clojure-mode
+				  emmet-mode
+				  exec-path-from-shell
+				  flycheck
+				  ido-ubiquitous
+				  ido-vertical-mode
                   magit
-	          monokai-theme
-			  multi-web-mode
-		  org
+				  monokai-theme
+				  multi-web-mode
+				  org
                   paredit
-		  powerline
+				  powerline
+				  projectile
                   smex
-		  soothe-theme
-		  sr-speedbar
-		  tern
-		  tern-auto-complete
+				  soothe-theme
+				  sr-speedbar
+				  tern
+				  tern-auto-complete
                   undo-tree
-		  ;;web-mode
+				  ;;web-mode
+				  yasnippet
 				  )))
 
 ;; Load theme
@@ -94,6 +99,27 @@
 (require 'smex)
 (smex-initialize)
 
+;; paredit.el
+(require 'paredit)
+(defun turn-on-paredit () (paredit-mode 1))
+
+;; autopair.el
+(require 'autopair)
+(autopair-global-mode)
+
+;; yasnippet.el
+(require 'yasnippet)
+(yas-global-mode 1)
+
+;; exec-path-from-shell.el
+(when (memq window-system '(mac ns))
+  (require 'exec-path-from-shell)
+  (exec-path-from-shell-initialize))
+
+;; projectile.el
+(require 'projectile)
+(projectile-global-mode)
+
 ;; web-mode.el
 ;;(require 'web-mode)
 ;;(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
@@ -122,6 +148,7 @@
 ;; Hooks
 (add-hook 'js-mode-hook (lambda () (tern-mode t)))
 (add-hook 'after-init-hook #'global-flycheck-mode)
+(add-hook 'clojure-mode-hook 'turn-on-paredit)
 
 ;; Load custom.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
