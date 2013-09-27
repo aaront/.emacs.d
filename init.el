@@ -1,3 +1,4 @@
+
 ;;; Aaron's Emacs Config
 
 ;; Turn off mouse interface early in startup to avoid momentary display
@@ -10,14 +11,21 @@
 (setq inhibit-startup-screen t)
 
 ;; Some defaults
-(setq default-tab-width 4)
 (setq tab-width 4)
 (setq ring-bell-function 'ignore)
 (setq line-spacing 4)
 (setq frame-title-format '(buffer-file-name "%f" ("%b")))
+(setq redisplay-dont-pause t)
 (global-hl-line-mode t)
 (column-number-mode t)
 (size-indication-mode t)
+;; No border
+(add-to-list 'default-frame-alist '(internal-border-width . 0))
+(setq scroll-margin 0
+      scroll-conservatively 100000
+      scroll-preserve-screen-position 1)
+(set-frame-parameter (selected-frame) 'alpha '(95 90))
+(add-to-list 'default-frame-alist '(alpha 95 90))
 
 ;; CUA-mode
 (cua-mode t)
@@ -47,28 +55,30 @@
            (unless (package-installed-p package)
              (package-install package)))
                 '(autopair
-				  clojure-mode
-				  emmet-mode
-				  exec-path-from-shell
-				  flycheck
-				  ido-ubiquitous
-				  ido-vertical-mode
+		  clojure-mode
+		  emmet-mode
+		  exec-path-from-shell
+		  flx-ido
+		  flycheck
+		  ido-ubiquitous
+		  ido-vertical-mode
+		  js3-mode
                   magit
-				  monokai-theme
-				  multi-web-mode
-				  org
+		  monokai-theme
+		  multi-web-mode
+		  org
                   paredit
-				  powerline
-				  projectile
+		  powerline
+		  projectile
                   smex
-				  soothe-theme
-				  sr-speedbar
-				  tern
-				  tern-auto-complete
+		  soothe-theme
+		  sr-speedbar
+		  tern
+		  tern-auto-complete
                   undo-tree
-				  ;;web-mode
-				  yasnippet
-				  )))
+		  ;;web-mode
+		  yasnippet
+		  )))
 
 ;; Load theme
 (load-theme 'soothe t)
@@ -86,6 +96,7 @@
 (ido-mode t)
 (ido-ubiquitous-mode t)
 (ido-vertical-mode t)
+(flx-ido-mode 1)
 
 ;; powerline.el
 (require 'powerline)
