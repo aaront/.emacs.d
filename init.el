@@ -24,8 +24,8 @@
 (setq scroll-margin 0
       scroll-conservatively 100000
       scroll-preserve-screen-position 1)
-(set-frame-parameter (selected-frame) 'alpha '(95 90))
-(add-to-list 'default-frame-alist '(alpha 95 90))
+(set-frame-parameter (selected-frame) 'alpha '(97 90))
+(add-to-list 'default-frame-alist '(alpha 97 90))
 
 ;; CUA-mode
 (cua-mode t)
