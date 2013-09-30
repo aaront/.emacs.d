@@ -66,6 +66,7 @@
                   magit
 		  monokai-theme
 		  multi-web-mode
+		  nrepl
 		  org
                   paredit
 		  powerline
