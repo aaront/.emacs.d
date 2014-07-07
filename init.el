@@ -1,45 +1,50 @@
+;;; init.el -- Aaron's very minimal init.el
 
-;;; Aaron's Emacs Config
+;; Generally nice stuff to have
 
-;; Turn off mouse interface early in startup to avoid momentary display
-;;(when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-(when (fboundp 'show-paren-mode) (show-paren-mode 1))
-(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-
-;; No splash screen
-(setq inhibit-startup-screen t)
-
-;; Some defaults
-(setq tab-width 4)
-(setq ring-bell-function 'ignore)
-(setq line-spacing 4)
-(setq frame-title-format '(buffer-file-name "%f" ("%b")))
-(setq redisplay-dont-pause t)
-(global-hl-line-mode t)
-(column-number-mode t)
-(size-indication-mode t)
-;; No border
-(add-to-list 'default-frame-alist '(internal-border-width . 0))
-(setq scroll-margin 0
-      scroll-conservatively 100000
-      scroll-preserve-screen-position 1)
-(set-frame-parameter (selected-frame) 'alpha '(97 90))
-(add-to-list 'default-frame-alist '(alpha 97 90))
-
-;; CUA-mode
+;; Cut-copy-paste
 (cua-mode t)
+(setq cua-auto-tabify-rectangles nil) ;; Don't tabify after rectangle commands
+(transient-mark-mode 1) ;; No region when it is not highlighted
+(setq cua-keep-region-after-copy t) ;; Standard Windows behaviour
+
+;; Don't use messages that you don't read
+(setq initial-scratch-message "")
+(setq inhibit-startup-message t)
+
+;; Don't let Emacs hurt your ears or eyes
+(setq ring-bell-function 'ignore)
+(setq redisplay-dont-pause t)
+
+;; No blinkin' cursor
+(blink-cursor-mode -1)
+
+;; No toolbar
+(tool-bar-mode -1)
+
+;; No scrollbars
+(scroll-bar-mode -1)
+
+;; Line numbering
+(global-linum-mode t)
+(setq linum-format " %4d ")
+
+;; Delay updates to give Emacs a chance for other changes
+(setq linum-delay t)
+
+;; scrolling to always be a line at a time
+(setq scroll-conservatively 10000)
 
 ;; Move backups to a common folder
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
-  backup-by-copying t    ; Don't delink hardlinks
-  version-control t      ; Use version numbers on backups
-  delete-old-versions t  ; Automatically delete excess backups
-  kept-new-versions 20   ; how many of the newest versions to keep
-  kept-old-versions 5    ; and how many of the old
+  backup-by-copying t ; Don't delink hardlinks
+  version-control t ; Use version numbers on backups
+  delete-old-versions t ; Automatically delete excess backups
+  kept-new-versions 20 ; how many of the newest versions to keep
+  kept-old-versions 5 ; and how many of the old
   )
 
-;; package.el
+;; packages
 (require 'package)
 (setq package-user-dir "~/.emacs.d/elpa/")
 (add-to-list 'package-archives
@@ -48,119 +53,94 @@
 
 ;; Install packages
 (defun at-install-packages ()
-  "Install only the sweetest of packages."
+  "Install mah packages."
   (interactive)
   (package-refresh-contents)
   (mapc #'(lambda (package)
-           (unless (package-installed-p package)
-             (package-install package)))
-                '(autopair
-		  clojure-mode
-		  emmet-mode
-		  exec-path-from-shell
-		  flx-ido
-		  flycheck
-		  ido-ubiquitous
-		  ido-vertical-mode
-		  js3-mode
-                  magit
-		  monokai-theme
-		  multi-web-mode
-		  nrepl
-		  org
-                  paredit
-		  powerline
-		  projectile
-                  smex
-		  soothe-theme
-		  sr-speedbar
-		  tern
-		  tern-auto-complete
-                  undo-tree
-		  ;;web-mode
-		  yasnippet
-		  )))
+	    (unless (package-installed-p package)
+	      (package-install package)))
+        '(ample-theme
+	  auto-complete
+          autopair
+          csharp-mode
+	  exec-path-from-shell
+	  flycheck
+          flx-ido
+          ido
+          ido-ubiquitous
+          ido-vertical-mode
+          jedi
+          json-mode
+          json-reformat
+          powershell
+	  projectile
+	  smex
+	  sr-speedbar)))
 
-;; Load theme
-(load-theme 'soothe t)
+;; theme
+(require 'ample-theme)
 
-;; linum.el
-(require 'linum)
-(global-linum-mode t)
-
-;; recentf.el
-(require 'recentf)
-(recentf-mode 1)
-
-;; ido.el
-(require 'ido)
-(ido-mode t)
-(ido-ubiquitous-mode t)
-(ido-vertical-mode t)
-(flx-ido-mode 1)
-
-;; powerline.el
-(require 'powerline)
-(powerline-reset)
-(powerline-default-theme)
-
-;; sr-speedbar.el
-(require 'sr-speedbar)
-
-;; smex.el
-(require 'smex)
-(smex-initialize)
-
-;; paredit.el
-(require 'paredit)
-(defun turn-on-paredit () (paredit-mode 1))
-
-;; autopair.el
+;; autopair
 (require 'autopair)
 (autopair-global-mode)
 
-;; yasnippet.el
-(require 'yasnippet)
-(yas-global-mode 1)
+;; recentf
+(require 'recentf)
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+(global-set-key "\C-x\ \C-r" 'recentf-open-files)
+
+;; ido
+(require 'ido)
+(ido-mode t)
+
+(require 'flx-ido)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+(setq ido-use-faces nil)
+
+(require 'ido-vertical-mode)
+(ido-vertical-mode 1)
+
+(require 'ido-ubiquitous)
+(ido-ubiquitous-mode 1)
+
+;; Fix ido-ubiquitous for newer packages
+(defmacro ido-ubiquitous-use-new-completing-read (cmd package)
+  `(eval-after-load ,package
+     '(defadvice ,cmd (around ido-ubiquitous-new activate)
+        (let ((ido-ubiquitous-enable-compatibility nil))
+          ad-do-it))))
+
+(ido-ubiquitous-use-new-completing-read webjump 'webjump)
+(ido-ubiquitous-use-new-completing-read yas/expand 'yasnippet)
+(ido-ubiquitous-use-new-completing-read yas/visit-snippet-file 'yasnippet)
+
+;; jedi.el
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+
+;; smex
+(require 'smex)
+(defun smex-update-after-load (unused)
+  (when (boundp 'smex-cache)
+    (smex-update)))
+(add-hook 'after-load-functions 'smex-update-after-load)
+
+;; Flycheck
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+;; Auto-complete
+(require 'auto-complete-config)
+(ac-config-default)
 
 ;; exec-path-from-shell.el
 (when (memq window-system '(mac ns))
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize))
 
-;; projectile.el
+;; projectile
 (require 'projectile)
-(projectile-global-mode)
-
-;; web-mode.el
-;;(require 'web-mode)
-;;(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-;;(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-;;(add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
-;;(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-;;(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-;;(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-;;(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-
-;; tern-auto-complete.el
-;;(eval-after-load 'tern
-;;   '(progn
-;;      (require 'tern-auto-complete)
-;;      (tern-ac-setup)))
-
-(require 'multi-web-mode)
-(setq mweb-default-major-mode 'html-mode)
-(setq mweb-tags 
-  '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
-    (js-mode  "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
-    (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
-(setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
-(multi-web-global-mode 1)
-
-;; Hooks
-(add-hook 'js-mode-hook (lambda () (tern-mode t)))
-(add-hook 'after-init-hook #'global-flycheck-mode)
-(add-hook 'clojure-mode-hook 'turn-on-paredit)
 
 ;; Load custom.el
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
