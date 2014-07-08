@@ -35,6 +35,9 @@
 ;; scrolling to always be a line at a time
 (setq scroll-conservatively 10000)
 
+;; line spacing
+(setq-default line-spacing 2)
+
 ;; Move backups to a common folder
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
   backup-by-copying t ; Don't delink hardlinks
@@ -59,13 +62,15 @@
   (mapc #'(lambda (package)
 	    (unless (package-installed-p package)
 	      (package-install package)))
-        '(ample-theme
+        '(;;ample-theme
 	  auto-complete
           autopair
           csharp-mode
 	  exec-path-from-shell
 	  flycheck
           flx-ido
+	  go-mode
+	  god-mode
           ido
           ido-ubiquitous
           ido-vertical-mode
@@ -75,10 +80,15 @@
           powershell
 	  projectile
 	  smex
+	  solarized-theme
 	  sr-speedbar)))
 
 ;; theme
-(require 'ample-theme)
+;;(require 'solarized-theme)
+;;(setq solarized-distinct-fringe-background -1)
+(setq solarized-high-contrast-mode-line t)
+(setq solarized-use-more-italic t)
+(require 'solarized-dark-theme)
 
 ;; autopair
 (require 'autopair)
@@ -116,6 +126,11 @@
 (ido-ubiquitous-use-new-completing-read yas/expand 'yasnippet)
 (ido-ubiquitous-use-new-completing-read yas/visit-snippet-file 'yasnippet)
 
+;; God mode
+(require 'god-mode)
+(global-set-key (kbd "<escape>") 'god-local-mode)
+(add-to-list 'god-exempt-major-modes 'dired-mode)
+
 ;; jedi.el
 (add-hook 'python-mode-hook 'jedi:setup)
 (setq jedi:complete-on-dot t)
@@ -133,6 +148,8 @@
 ;; Auto-complete
 (require 'auto-complete-config)
 (ac-config-default)
+(setq ac-auto-show-menu 0.8)
+(auto-complete-mode t)
 
 ;; exec-path-from-shell.el
 (when (memq window-system '(mac ns))
