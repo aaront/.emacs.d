@@ -63,8 +63,10 @@
 	    (unless (package-installed-p package)
 	      (package-install package)))
         '(;;ample-theme
-	  auto-complete
+	  ;;auto-complete
           autopair
+	  company
+	  company-go
           csharp-mode
 	  exec-path-from-shell
 	  flycheck
@@ -83,12 +85,12 @@
 	  solarized-theme
 	  sr-speedbar)))
 
-;; theme
+;; Theme
 ;;(require 'solarized-theme)
 ;;(setq solarized-distinct-fringe-background -1)
 (setq solarized-high-contrast-mode-line t)
 (setq solarized-use-more-italic t)
-(require 'solarized-dark-theme)
+(require 'solarized-light-theme)
 
 ;; autopair
 (require 'autopair)
@@ -146,15 +148,22 @@
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
 ;; Auto-complete
-(require 'auto-complete-config)
-(ac-config-default)
-(setq ac-auto-show-menu 0.8)
-(auto-complete-mode t)
+;;(require 'auto-complete-config)
+;;(ac-config-default)
+;;(setq ac-auto-show-menu 0.8)
+;;(auto-complete-mode t)
+
+;; Company
+(add-hook 'after-init-hook 'global-company-mode)
 
 ;; exec-path-from-shell.el
 (when (memq window-system '(mac ns))
   (require 'exec-path-from-shell)
   (exec-path-from-shell-initialize))
+
+;; powershell
+(when (memq window-system '(win32 w32))
+  (autoload 'powershell "powershell" "Run powershell as a shell within emacs." t))
 
 ;; projectile
 (require 'projectile)
@@ -163,6 +172,8 @@
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
   (load custom-file))
+
+(server-start)
 
 (provide 'init)
 ;;; init.el ends here
